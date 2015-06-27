@@ -1,1 +1,1 @@
-tiny and slow ;) php classes for work with cookies
+tiny and slow ;) php classes for work with PhantomJS
