@@ -46,7 +46,7 @@ class PhantomJs
     /**
      * @var string
      */
-    protected $keyStream;
+    protected $key;
 
     const COOKIES_FILE = '--cookies-file';
     const IGNORE_SSL_ERRORS = '--ignore-ssl-errors';
@@ -64,7 +64,7 @@ class PhantomJs
     /**
      * @var PhantomJsCookie
      */
-    private $cookie;
+    public $cookie;
     /**
      * @var UserAgentSwitcher
      */
@@ -139,22 +139,22 @@ class PhantomJs
     }
 
     /**
-     * @param string $keyStream
+     * @param string $key
      */
-    public function setKeyStream($keyStream = null)
+    public function setKey($key = null)
     {
-        $this->keyStream = $keyStream?:uniqid('phantomjs');
+        $this->key = $key ?: uniqid('phantomjs');
         $this->cookie->deleteFile();
-        $this->cookie->open($keyStream);
+        $this->cookie->open($key);
         $this->setDefaultOption(self::COOKIES_FILE, $this->cookie->getFileName());
     }
 
     /**
      * @return string
      */
-    public function getKeyStream()
+    public function getKey()
     {
-        return $this->keyStream;
+        return $this->key;
     }
 
     /**
@@ -284,6 +284,7 @@ class PhantomJs
             default:
                 $proxy = false;
         }
+
         return (bool)$proxy;
     }
 
@@ -338,7 +339,7 @@ class PhantomJs
             $this->setExecutor($executor);
         }
         $this->setPath(__DIR__);
-        $this->setKeyStream();
+        $this->setKey();
     }
 
     public function renderText($path, $screenWidthPx = 1280, $screenHeightPx = 720)
@@ -362,6 +363,7 @@ class PhantomJs
     public function sendPost($path, $postStr, $screenWidthPx = 1280, $screenHeightPx = 720)
     {
         $this->url = $path;
+
         return $this->customScript(
             'sendPost',
             [
@@ -416,6 +418,7 @@ class PhantomJs
         $shellArguments[] = $this->getScriptName();
         $shellArguments = array_merge($shellArguments, $arguments);
         $this->executor->setArguments($shellArguments);
+
         return $this->executor->exec(true); //if infinity run, Issue https://github.com/ariya/phantomjs/issues/10845
     }
 
@@ -437,7 +440,7 @@ class PhantomJs
     {
         if ($this->getUseProxy()) {
             if (is_object($this->proxy)) {
-                $proxy = $this->proxy->getProxy($this->getKeyStream(), $this->getUrl());
+                $proxy = $this->proxy->getProxy($this->getKey(), $this->getUrl());
                 if (is_string($proxy['proxy']) && DryPath::isIp($proxy['proxy'])) {
                     $this->setOption(self::PROXY, $proxy['proxy']);
                     $this->setOption(self::PROXY_TYPE, $proxy['protocol']);
@@ -452,13 +455,6 @@ class PhantomJs
             $this->setOption(self::PROXY_TYPE, null);
             $this->setOption(self::PROXY_AUTH, null);
         }
-    }
-
-    public function load($url)
-    {
-        $this->setOption(self::LOAD_IMAGES, 'false');
-
-        return $this->renderText($url);
     }
 
     public function getInfo()
