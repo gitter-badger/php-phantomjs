@@ -12,7 +12,7 @@ use bpteam\PhpShell\PhpShell;
 use bpteam\Cookie\PhantomJsCookie;
 use bpteam\UserAgentSwitcher\UserAgentSwitcher;
 
-class cPhantomJs
+class PhantomJs
 {
 
     /**
