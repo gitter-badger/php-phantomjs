@@ -69,6 +69,7 @@ class PhantomJs
      * @var UserAgentSwitcher
      */
     public $userAgent;
+    protected $currentUserAgent;
     /**
      * @var bool
      */
@@ -302,6 +303,19 @@ class PhantomJs
         return $this->referer;
     }
 
+    public function getUserAgent()
+    {
+        return $this->currentUserAgent ?: $this->userAgent->getRandomRecord();
+    }
+
+    /**
+     * @param string|bool|null $userAgent
+     */
+    public function setUserAgent($userAgent)
+    {
+        $this->currentUserAgent = $userAgent;
+    }
+
     function __construct($executor = false)
     {
         $this->setDefaultOptions(
@@ -333,7 +347,7 @@ class PhantomJs
         $answer = $this->customScript(
             'renderText',
             [
-                $this->userAgent->getRandomRecord(),
+                $this->getUserAgent(),
                 $this->getReferer(),
                 $path,
                 $screenWidthPx,
@@ -351,7 +365,7 @@ class PhantomJs
         return $this->customScript(
             'sendPost',
             [
-                $this->userAgent->getRandomRecord(),
+                $this->getUserAgent(),
                 $this->getReferer(),
                 $path,
                 $postStr,
@@ -366,7 +380,7 @@ class PhantomJs
         $data = $this->customScript(
             'renderImage',
             [
-                $this->userAgent->getRandomRecord(),
+                $this->getUserAgent(),
                 $this->getReferer(),
                 $path,
                 $screenWidthPx,
@@ -384,7 +398,7 @@ class PhantomJs
         return $this->customScript(
             'renderPdf',
             [
-                $this->userAgent->getRandomRecord(),
+                $this->getUserAgent(),
                 $this->getReferer(),
                 $path,
                 $fileName,
@@ -473,7 +487,7 @@ class PhantomJs
      */
     public function getErrors($path, $arguments = [])
     {
-        $answer = $this->customScript('getErrors', ['path' => $path,] + $arguments);
+        $answer = $this->customScript('getErrors', [$path,] + $arguments);
 
         return $answer;
     }
