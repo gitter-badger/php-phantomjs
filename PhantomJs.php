@@ -28,6 +28,10 @@ class PhantomJs
      */
     protected $answer;
     /**
+     * @var string
+     */
+    protected $phantom;
+    /**
      * @var PhpShell
      */
     protected $executor;
@@ -82,7 +86,7 @@ class PhantomJs
     public function setExecutor($executor)
     {
         $this->executor->setExecutor($executor);
-        $this->executor = $executor;
+        $this->phantom = $executor;
     }
 
     /**
@@ -133,7 +137,7 @@ class PhantomJs
     /**
      * @return string
      */
-    public function getPhantomFilesPath()
+    public function getPath()
     {
         return $this->path;
     }
@@ -145,7 +149,7 @@ class PhantomJs
     {
         $this->key = $key ?: uniqid('phantomjs');
         $this->cookie->deleteFile();
-        $this->cookie->open($key);
+        $this->cookie->open($this->key);
         $this->setDefaultOption(self::COOKIES_FILE, $this->cookie->getFileName());
     }
 
@@ -360,7 +364,7 @@ class PhantomJs
         return $answer;
     }
 
-    public function sendPost($path, $postStr, $screenWidthPx = 1280, $screenHeightPx = 720)
+    public function sendPost($path, array $post, $screenWidthPx = 1280, $screenHeightPx = 720)
     {
         $this->url = $path;
 
@@ -370,7 +374,7 @@ class PhantomJs
                 $this->getUserAgent(),
                 $this->getReferer(),
                 $path,
-                $postStr,
+                http_build_query($post),
                 $screenWidthPx,
                 $screenHeightPx
             ]
